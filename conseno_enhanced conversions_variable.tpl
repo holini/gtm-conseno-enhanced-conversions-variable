@@ -1,4 +1,4 @@
-﻿___INFO___
+___INFO___
 
 {
   "type": "MACRO",
@@ -6,7 +6,7 @@
   "version": 1,
   "securityGroups": [],
   "displayName": "Conseno - Enhanced Conversions - variable",
-  "description": "This custom variable helps to configure enhanced conversions.",
+  "description": "This custom variable helps configure Google Enhanced Conversions.",
   "containerContexts": [
     "WEB"
   ]
@@ -23,11 +23,11 @@ ___TEMPLATE_PARAMETERS___
   },
   {
     "type": "TEXT",
-    "name": "cookieName",
-    "displayName": "Cookie name",
+    "name": "consentVariable",
+    "displayName": "Select the in-line consent variable",
     "simpleValueType": true,
     "alwaysInSummary": true,
-    "help": "Specify a cookie name that refers to the cookie that contains the in-line consent decision that is either true or false (boolean).",
+    "help": "Select a GTM variable that returns the in-line consent decision, either true or false (boolean or string).",
     "notSetText": "Not set"
   },
   {
@@ -142,9 +142,7 @@ ___TEMPLATE_PARAMETERS___
 
 ___SANDBOXED_JS_FOR_WEB_TEMPLATE___
 
-const queryPermission = require('queryPermission');
-const getCookieValues = require('getCookieValues');
-const cookieName = data.cookieName;
+let consentVariable = data.consentVariable; // this value should be either true or false (boolean)
 const Object = require('Object');
 
 // Helper function to clean up the data
@@ -165,66 +163,50 @@ let region = cleanData(data.customerNameAddress_CustomerRegion);
 let postal_code = cleanData(data.customerNameAddress_PostalCode);
 let country = cleanData(data.customerNameAddress_CustomerCountry);
 
-// Check if permission to get cookies is granted
-if (queryPermission('get_cookies', cookieName) !== false) {
-    const conseno_cookie = getCookieValues(cookieName);
-    // If conseno_cookie doesn't exist or is empty, just return
-    if (!conseno_cookie || conseno_cookie.length === 0) {
-        return;
-    }
-  
-    if (conseno_cookie === "true") {
-        let returnObject = {};
-
-        // Add non-undefined variables to return object
-        if (email !== undefined) returnObject.email = email;
-        if (phone_number !== undefined) returnObject.phone_number = phone_number;
-
-        let address = {};
-        if (first_name !== undefined) address.first_name = first_name;
-        if (last_name !== undefined) address.last_name = last_name;
-        if (street !== undefined) address.street = street;
-        if (city !== undefined) address.city = city;
-        if (region !== undefined) address.region = region;
-        if (postal_code !== undefined) address.postal_code = postal_code;
-        if (country !== undefined) address.country = country;
-
-        // If any address field is present, add the address object to return object
-        if (Object.keys(address).length > 0) {
-            returnObject.address = address;
+// Check if consentVariable is boolean or not
+if (typeof consentVariable !== 'boolean') {
+    // If consentVariable is a string, check if it's "true" or "false"
+    if (typeof consentVariable === 'string') {
+        consentVariable = consentVariable.trim().toLowerCase();
+        if (consentVariable === 'true') {
+            consentVariable = true;
+        } else if (consentVariable === 'false') {
+            consentVariable = false;
+        } else {
+            return; // If the string is neither "true" nor "false", exit the function
         }
-        return returnObject;
     } else {
-        return;
+        return; // If consentVariable is not a boolean or a valid string, exit the function
     }
 }
 
+// If consentVariable is true, proceed with creating the return object
+if (consentVariable === true) {
+    let returnObject = {};
 
-___WEB_PERMISSIONS___
+    // Add non-undefined variables to return object
+    if (email !== undefined) returnObject.email = email;
+    if (phone_number !== undefined) returnObject.phone_number = phone_number;
 
-[
-  {
-    "instance": {
-      "key": {
-        "publicId": "get_cookies",
-        "versionId": "1"
-      },
-      "param": [
-        {
-          "key": "cookieAccess",
-          "value": {
-            "type": 1,
-            "string": "any"
-          }
-        }
-      ]
-    },
-    "clientAnnotations": {
-      "isEditedByUser": true
-    },
-    "isRequired": true
-  }
-]
+    let address = {};
+    if (first_name !== undefined) address.first_name = first_name;
+    if (last_name !== undefined) address.last_name = last_name;
+    if (street !== undefined) address.street = street;
+    if (city !== undefined) address.city = city;
+    if (region !== undefined) address.region = region;
+    if (postal_code !== undefined) address.postal_code = postal_code;
+    if (country !== undefined) address.country = country;
+
+    // If any address field is present, add the address object to return object
+    if (Object.keys(address).length > 0) {
+        returnObject.address = address;
+    }
+    return returnObject;
+
+// If consentVariable is false, or any other value, just return
+} else {
+    return;
+}
 
 
 ___TESTS___
@@ -235,5 +217,3 @@ scenarios: []
 ___NOTES___
 
 Created on 10/05/2024, 22:37:27
-
-
