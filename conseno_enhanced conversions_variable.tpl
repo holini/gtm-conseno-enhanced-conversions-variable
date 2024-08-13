@@ -173,7 +173,7 @@ if (queryPermission('get_cookies', cookieName) !== false) {
         return;
     }
   
-    if (conseno_cookie) {
+    if (conseno_cookie === "true") {
         let returnObject = {};
 
         // Add non-undefined variables to return object
