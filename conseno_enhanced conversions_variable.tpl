@@ -24,10 +24,10 @@ ___TEMPLATE_PARAMETERS___
   {
     "type": "TEXT",
     "name": "consentVariable",
-    "displayName": "Select the in-line consent variable",
+    "displayName": "Select the consent variable",
     "simpleValueType": true,
     "alwaysInSummary": true,
-    "help": "Select a GTM variable that returns the in-line consent decision, either true or false (boolean or string).",
+    "help": "Select a GTM variable that returns the consent decision, either true or false (boolean or string).",
     "notSetText": "Not set"
   },
   {
