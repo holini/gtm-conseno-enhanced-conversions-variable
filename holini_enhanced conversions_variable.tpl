@@ -5,7 +5,7 @@ ___INFO___
   "id": "cvt_temp_public_id",
   "version": 1,
   "securityGroups": [],
-  "displayName": "Conseno - Enhanced Conversions - variable",
+  "displayName": "Holini - Enhanced Conversions - variable",
   "description": "This custom variable helps configure Google Enhanced Conversions.",
   "containerContexts": [
     "WEB"
